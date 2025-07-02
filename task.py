@@ -12,7 +12,7 @@ from groq import Groq
 
 
 # --- Load Configuration from config.json ---
-with open(r'C:\Users\DELL\Desktop\flask\taskmanager\config.json', 'r') as c:
+with open(r'path to your config.json for description read READNE.md', 'r') as c:
     params = json.load(c)["params"]
 
 local_server = True
