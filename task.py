@@ -1,38 +1,55 @@
+import os
+from datetime import datetime, date
 from flask import Flask, render_template, request, flash, redirect, url_for, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_mail import Mail, Message
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin, LoginManager, login_user, logout_user, login_required, current_user
-import json
-import os
-from datetime import datetime, date
+import json # You might still keep this if config.json has non-sensitive params
 
 # pip import Groq ---
 from groq import Groq
 
-
-# --- Load Configuration from config.json ---
-with open(r'path to your config.json for description read READNE.md', 'r') as c:
-    params = json.load(c)["params"]
-
-local_server = True
+# --- Load Configuration from environment variables ---
+# Using os.environ.get() is best practice for production
 app = Flask(__name__)
-app.secret_key = 'super secret key' # Consider moving this to config.json for production
-app.config['UPLOAD_FOLDER'] = params['upload_location']
 
+# 1. SECRET_KEY
+app.secret_key = os.environ.get('SECRET_KEY', 'your_default_dev_secret_key') 
+# ^^^ In production, ensure 'your_default_dev_secret_key' is NEVER used. 
+# The environment variable should always override it.
+
+# 2. UPLOAD_FOLDER (if you are actually handling uploads, otherwise remove)
+app.config['UPLOAD_FOLDER'] = os.environ.get('UPLOAD_FOLDER', 'static/uploads')
+
+# 3. Mail Configuration
 app.config.update(
-    MAIL_SERVER = 'smtp.gmail.com',
-    MAIL_PORT = '465',
-    MAIL_USE_SSL = True,
-    MAIL_USERNAME = params['gmail_user'],
-    MAIL_PASSWORD= params['gmail_password']
+    MAIL_SERVER = os.environ.get('MAIL_SERVER', 'smtp.gmail.com'),
+    MAIL_PORT = int(os.environ.get('MAIL_PORT', 465)),
+    MAIL_USE_SSL = os.environ.get('MAIL_USE_SSL', 'True').lower() in ('true', '1', 't'),
+    MAIL_USERNAME = os.environ.get('MAIL_USERNAME'), # MUST be set in prod env
+    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')  # MUST be set in prod env
 )
 mail = Mail(app)
 
-if(local_server):
-    app.config['SQLALCHEMY_DATABASE_URI'] = params['local_uri']
-else:
-    app.config['SQLALCHEMY_DATABASE_URI'] = params['prod_uri']
+# 4. Database URI
+# For local development, you might still use SQLite or a local Postgres.
+# For production, you MUST use DATABASE_URL provided by the hosting.
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
+if not app.config['SQLALCHEMY_DATABASE_URI']: # Fallback for local development or explicit local config
+    # This block is for local development only, using your local config.json if needed
+    # In production, DATABASE_URL *must* be set.
+    try:
+        with open('config.json', 'r') as c: # Changed path to be relative
+            params = json.load(c)["params"]
+        if params.get('local_server', False): # Use a boolean flag, default False
+             app.config['SQLALCHEMY_DATABASE_URI'] = params['local_uri']
+        else:
+             app.config['SQLALCHEMY_DATABASE_URI'] = params['prod_uri'] # This should ideally be DATABASE_URL
+    except FileNotFoundError:
+        print("Warning: config.json not found. Ensure DATABASE_URL is set in environment.")
+        # Fallback for very basic local run if config.json is missing and no env var
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db' 
 
 db = SQLAlchemy(app)
 
@@ -44,7 +61,6 @@ login_manager.login_message_category = 'info'
 def load_user(user_id):
     return db.session.get(User, int(user_id))
 
-# --- Database Models ---
 
 class User(db.Model, UserMixin):
     __tablename__ = 'register'
@@ -367,10 +383,11 @@ def delete_note(note_id):
 
 # ... (snip) ...
 
-try:
-    groq_client = Groq(api_key=params['GROQ_API_KEY'])
-except KeyError:
-    print("Error: 'GROQ_API_KEY' not found in config.json params.")
+groq_api_key = os.environ.get('GROQ_API_KEY')
+if groq_api_key:
+    groq_client = Groq(api_key=groq_api_key)
+else:
+    print("Error: 'GROQ_API_KEY' environment variable not set. AI summarization will not work.")
     groq_client = None # Handle case where key is missing
 
 @app.route('/api/summarize_note', methods=['POST'])
@@ -413,10 +430,8 @@ def summarize_note_api():
 def summery_page():
     notes = Note.query.filter_by(user_id=current_user.id).order_by(Note.timestamp.desc()).all()
     return render_template('summery.html', notes=notes, user=current_user)
-
-
 # --- Database Creation (Run this once on startup) ---
 if __name__ == '__main__':
     with app.app_context():
         db.create_all() # Creates tables if they don't exist
-    app.run(debug=True)
+    app.run(debug=True) # For local development
