@@ -1,0 +1,16 @@
+# Environment variables
+.env
+
+# Python virtual environment
+venv/
+env/ # if your venv is named 'env'
+__pycache__/
+*.pyc
+
+# Database files
+*.db
+*.sqlite
+
+# Any other temporary files or IDE-specific files
+.vscode/
+.idea/
