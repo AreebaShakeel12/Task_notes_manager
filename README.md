@@ -1,4 +1,4 @@
-# Smart Productivity Hub (or your project name)
+# Task_notes_manager
 
 This is a Flask-based web application designed to help you manage your notes with AI summarization capabilities.
 
@@ -11,8 +11,8 @@ Follow these steps to set up and run the application locally.
 First, clone this repository to your local machine:
 
 ```bash
-git clone [https://github.com/AreebaShakeel12/flask-task-manager.git](https://github.com/AreebaShakeel12/flask-task-manager.git)
-cd flask-task-manager
+git clone [https://github.com/AreebaShakeel12/Task_notes_manager.git](https://github.com/AreebaShakeel12/Task_notes_manager.git)
+cd Task_notes_manager
 
 
 ### Configuration
