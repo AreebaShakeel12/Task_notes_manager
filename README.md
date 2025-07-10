@@ -1,103 +1,104 @@
-# Task_notes_manager
+Smart Productivity Hub: Tasks + AI Notes
+Project Overview
+This is a comprehensive web application built with Flask that helps users manage their tasks and notes efficiently. It includes robust user authentication, a dynamic task manager with filtering and sorting capabilities, and a notes section powered by Groq AI for intelligent summarization.
+This project was developed to showcase full-stack web development skills, combining a Python backend with a responsive frontend.
 
-This is a Flask-based web application designed to help you manage your notes with AI summarization capabilities.
+Features
+User Authentication: Secure registration and login system, ensuring personalized access for each user.
+Task Management:
+Add, edit, and delete tasks with ease.
+Mark tasks as complete or incomplete, providing a clear overview of your progress.
+Assign due dates and set task priorities (Normal, High, Low) to keep organized.
+Filter tasks by status (All, Completed, Active, Has Due Date) and sort them by creation date or due date.
+A dashboard provides a quick glance at today's and upcoming tasks, along with overall completion progress.
+Notes Section:
+Create, view, edit, and delete personal notes.
+AI Notes Summarizer: Leveraging the Groq API (specifically the Llama 3 model), this feature generates concise summaries of your longer notes, saving you time and highlighting key information.
+Responsive Design: Built with Bootstrap 5, ensuring a clean, modern, and mobile-friendly user interface that looks great on any device.
+Tech Stack
+Backend: Python, Flask, Flask-SQLAlchemy
+Database: PostgreSQL (for production deployment), SQLite (for local development)
+Frontend: HTML, CSS (Bootstrap 5), JavaScript
+Authentication: Flask-Login, Werkzeug (for password hashing)
+Email: Flask-Mail (for potential future features like password reset or notifications)
+AI Integration: Groq API (for notes summarization)
+Deployment: Render (recommended for ease of use and free tier options)
+Dependency Management: pip, requirements.txt
+Version Control: Git, GitHub
+Setup & Local Development
+To get a copy of this project up and running on your local machine, follow these steps.
 
-## Getting Started
+Prerequisites
+Python 3.8+ installed on your system.
+pip (Python package installer), usually comes with Python.
+vrtualenv or venv (Python's built-in virtual environment module).
 
-Follow these steps to set up and run the application locally.
-
-### 1. Clone the Repository
-
-First, clone this repository to your local machine:
-
-```bash
-git clone [https://github.com/AreebaShakeel12/Task_notes_manager.git](https://github.com/AreebaShakeel12/Task_notes_manager.git)
+Installation Steps
+Clone the repository:
+Bash
+git clone https://github.com/AreebaShakeel12/Task_notes_manager.git
 cd Task_notes_manager
+Create and activate a virtual environment:
+Bash
+python -m venv venv
+# On Windows (Command Prompt/Git Bash):
+# .\venv\Scripts\activate
+# On Windows (PowerShell):
+# . .\venv\Scripts\Activate.ps1
+# On macOS/Linux:
+# source venv/bin/activate
+Install project dependencies:
+Bash
+pip install -r requirements.txt
+Set up Environment Variables for Local Development:
+Create a file named .env in the root of your project directory (the same place as task.py). This .env file should NEVER be committed to Git.
 
+Here's an example of what your .env file might contain for local testing:
 
-### Configuration
+Code snippet
+# .env - For LOCAL DEVELOPMENT ONLY. Do NOT commit to Git.
+SECRET_KEY=your_super_strong_and_random_secret_key_for_dev
+MAIL_USERNAME=your_gmail_email@example.com
+MAIL_PASSWORD=your_gmail_app_password # Use an App Password if you have 2FA enabled
+GROQ_API_KEY=your_groq_api_key_from_dashboard
+DATABASE_URL=sqlite:///site.db # Using SQLite for simple local testing
+UPLOAD_FOLDER=static/uploads # Relative path for file uploads (if implemented)
+SECRET_KEY: Generate a long, random string.
+MAIL_USERNAME / MAIL_PASSWORD: Your Gmail credentials for sending emails (consider using an App Password if you have 2-Factor Authentication enabled).
+GROQ_API_KEY: Get this from your Groq Console.
+DATABASE_URL: For local development, sqlite:///site.db is easy. For local PostgreSQL, it would be postgresql://user:password@localhost:5432/your_database_name.
 
-This application relies on a `config.json` file to store various application settings, including sensitive API keys and database connection details. For security reasons, this file is **NOT** included in the repository (it's listed in `.gitignore`) and should never be committed to version control.
+Initialize the Database:
+With your virtual environment activated, run your main application file once. This will create the site.db file (if using SQLite) and necessary database tables.
 
-**Steps to create and populate your `config.json` file:**
+Bash
+python task.py
+You can press Ctrl+C to stop the development server after it starts.
+Run the application:
 
-1.  **Create the `config.json` file:**
-    * In the **root directory** of your project (the same folder where `app.py` and `requirements.txt` are located), create a new file named exactly `config.json`.
+Bash
+flask run
+Your Smart Productivity Hub should now be running locally, typically accessible at http://127.0.0.1:5000/.
 
-2.  **Add the basic structure:**
-    * Copy the following JSON structure into your newly created `config.json` file. This defines the `params` object which holds all your configuration variables:
+How to Use the App
+Register: Head to the registration page (/register) to create a new user account.
+Login: Log in with your newly created credentials.
+Dashboard: Your personalized dashboard gives you a quick overview of today's and upcoming tasks, along with your overall task completion progress.
+Tasks: Navigate to the "Tasks" page to manage your to-do list. Here you can add new tasks, mark them as complete, edit their details (title, due date, priority), or delete them. Use the intuitive filter and sort options to organize your view.
+Notes: Visit the "Notes" section to create and manage your personal notes. For longer notes, simply click the "Summarize" button to get a concise, AI-generated summary.
+Deployment
+This application is configured for easy deployment on cloud platforms like  or . These platforms offer robust infrastructure and free tiers suitable for showcasing your project.
 
-    ```json
-    {
-      "params": {
-        "local_server": true,
-        "local_uri": "mysql+pymysql://root:@localhost/smarthub",
-        "prod_uri": "mysql+pymysql://root:@localhost/smarthub",
-        "gmail_user": "your_gmail_username",
-        "gmail_password": "your_gmail_app_password",
-        "GROQ_API_KEY": "your_groq_api_key",
-        "upload_location": "path/to/your/upload/folder"
-      }
-    }
-    ```
+Key Deployment Considerations:
+Database: You'll need to provision a PostgreSQL database on your chosen hosting platform (e.g., Render's managed PostgreSQL service). Your DATABASE_URL environment variable will then be set to the connection string provided by the platform.
 
-3.  **Populate with your specific details:**
+Environment Variables: All sensitive keys (like SECRET_KEY, MAIL_USERNAME, MAIL_PASSWORD, GROQ_API_KEY) and dynamic paths (UPLOAD_FOLDER) must be configured as environment variables directly in your hosting platform's dashboard.
 
-    * **`"local_server": true/false`**:
-        * Set to `true` if you are running the application on your local machine for development.
-        * Set to `false` if you are deploying to a production server (though typically, this might be handled by environment variables in a production setup).
+Start Command: On Render, your start command will be gunicorn task:app
 
-    * **`"local_uri": "mysql+pymysql://root:@localhost/smarthub"`**:
-        * This is your **database connection string for local development**.
-        * **`mysql+pymysql`**: Specifies the database type (MySQL) and the Python driver (`pymysql`).
-        * **`root:@localhost`**: Your MySQL username (`root`) and an empty password (`:` before `@`). Replace `root` with your actual MySQL username if different. If you have a password for your MySQL user, it would be `username:password@localhost`.
-        * **`/smarthub`**: The name of your database. Ensure you have a database named `smarthub` created in your MySQL server, or change this to your desired database name.
+Contributing
+Contributions are welcome! If you find bugs, have feature requests, or want to improve the code, please feel free to fork the repository, create a feature branch, and submit a pull request.
 
-    * **`"prod_uri": "mysql+pymysql://root:@localhost/smarthub"`**:
-        * This is intended for your **production database connection string**.
-        * **Important:** In a real production deployment, this URI will be different (e.g., pointing to a cloud database service) and should ideally be managed via **environment variables** on your hosting platform, not hardcoded here. For a truly production setup, you would likely remove this from `config.json` and use `os.environ.get('DATABASE_URL_PROD')` in your Flask app.
+Author
+Areeba Shakeel
 
-    * **`"gmail_user": "your_gmail_username"`**:
-        * Enter your **Gmail email address** here (e.g., `"myemail@gmail.com"`). This is likely used for sending emails (e.g., password resets).
-
-    * **`"gmail_password": "your_gmail_app_password"`**:
-        * **CRITICAL:** You should **NOT** use your main Gmail password here. You need to generate a **Gmail App Password**.
-        * **How to obtain a Gmail App Password:**
-            1.  Go to your Google Account (myaccount.google.com).
-            2.  Navigate to "Security."
-            3.  Under "How you sign in to Google," select "App passwords." (If you don't see this, you might need to enable 2-Step Verification first).
-            4.  Follow the prompts to generate a new app password.
-            5.  Copy the 16-character password and paste it here.
-        * Example: `"gmail_password": "abcd efgh ijkl mnop"` (without spaces)
-
-    * **`"GROQ_API_KEY": "your_groq_api_key"`**:
-        * This key is essential for accessing the Groq API for AI summarization.
-        * **How to obtain:**
-            1.  Go to the [Groq Console](https://console.groq.com/keys).
-            2.  Sign up or log in with your account.
-            3.  Navigate to the "API Keys" section.
-            4.  Click on "Create new API Key" (or similar button).
-            5.  Copy the generated API key (it typically starts with `sk_`).
-            6.  Paste this key as the value for `GROQ_API_KEY` in your `config.json`.
-        * Example: `"GROQ_API_KEY": "sk_your_actual_groq_api_key_xxxxxxxxxxxxxxxxxxxxxxxxxxxxx"`
-
-    * **`"upload_location": "path/to/your/upload/folder"`**:
-        * Specify the **absolute or relative path** to a directory where files (if your application handles uploads) will be stored.
-        * Example (relative path, within your project): `"upload_location": "static/uploads"`
-        * Example (absolute path for testing, Windows): `"upload_location": "C:\\Users\\YourUser\\Desktop\\flask\\taskmanager\\uploads"` (Note the double backslashes for Windows paths in JSON).
-        * Ensure this folder exists and your application has write permissions to it.
-
-**Your final `config.json` file should look similar to this (with your actual, sensitive details):**
-
-```json
-{
-  "params": {
-    "local_server": true,
-    "local_uri": "mysql+pymysql://root:your_mysql_password@localhost/smarthub",
-    "prod_uri": "mysql+pymysql://username:password@your_production_db_host/your_prod_db",
-    "gmail_user": "your_actual_email@gmail.com",
-    "gmail_password": "your_generated_gmail_app_password",
-    "GROQ_API_KEY": "sk_your_unique_groq_api_key_obtained_from_groq_console",
-    "upload_location": "static/uploads"
-  }
-}
